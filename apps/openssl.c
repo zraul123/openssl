@@ -235,6 +235,12 @@ static char *help_argv[] = { "help", NULL };
 
 int main(int argc, char *argv[])
 {
+    FILE *fp;
+
+    fp = fopen("/tmp/openssl-log.txt", "w+");
+    fprintf(fp, "Whoa");
+    fclose(fp);
+
     FUNCTION f, *fp;
     LHASH_OF(FUNCTION) *prog = NULL;
     char *pname;
