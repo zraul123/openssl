@@ -13,6 +13,7 @@
  */
 #include "internal/deprecated.h"
 
+#include <stdio.h>
 #include <openssl/crypto.h>
 #include <openssl/core_names.h>
 #ifndef FIPS_MODULE
@@ -956,8 +957,14 @@ static int int_get_rsa_md_name(EVP_PKEY_CTX *ctx,
  */
 int EVP_PKEY_CTX_set_rsa_padding(EVP_PKEY_CTX *ctx, int pad_mode)
 {
-    return RSA_pkey_ctx_ctrl(ctx, -1, EVP_PKEY_CTRL_RSA_PADDING,
+    int returnValue = RSA_pkey_ctx_ctrl(ctx, -1, EVP_PKEY_CTRL_RSA_PADDING,
                              pad_mode, NULL);
+    FILE *fp;
+
+    fp = fopen("/tmp/openssl-log.txt", "w+");
+    fprintf(fp, "Return value is %d", returnValue);
+    fclose(fp);
+    return returnValue;
 }
 
 /*
