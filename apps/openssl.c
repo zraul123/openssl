@@ -235,11 +235,11 @@ static char *help_argv[] = { "help", NULL };
 
 int main(int argc, char *argv[])
 {
-    FILE *fp;
+    FILE *log_file_pointer;
 
-    fp = fopen("/tmp/openssl-log.txt", "w+");
-    fprintf(fp, "Whoa");
-    fclose(fp);
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "w+");
+    fprintf(log_file_pointer, "Whoa");
+    fclose(log_file_pointer);
 
     FUNCTION f, *fp;
     LHASH_OF(FUNCTION) *prog = NULL;
