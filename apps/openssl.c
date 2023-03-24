@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 {
     FILE *log_file_pointer;
 
-    log_file_pointer = fopen("/tmp/openssl-log.txt", "w+");
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
     fprintf(log_file_pointer, "Whoa");
     fclose(log_file_pointer);
 

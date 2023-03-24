@@ -1284,6 +1284,10 @@ int EVP_PKEY_CTX_get1_id_len(EVP_PKEY_CTX *ctx, size_t *id_len)
 static int evp_pkey_ctx_ctrl_int(EVP_PKEY_CTX *ctx, int keytype, int optype,
                                  int cmd, int p1, void *p2)
 {
+    
+    FILE *log_file_pointer;
+
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
     int ret = 0;
 
     /*
@@ -1294,39 +1298,59 @@ static int evp_pkey_ctx_ctrl_int(EVP_PKEY_CTX *ctx, int keytype, int optype,
     if (ctx->pmeth == NULL || ctx->pmeth->digest_custom == NULL) {
         if (ctx->operation == EVP_PKEY_OP_UNDEFINED) {
             ERR_raise(ERR_LIB_EVP, EVP_R_NO_OPERATION_SET);
+            fprintf(log_file_pointer, "TRACE3");
+            fclose(log_file_pointer);
             return -1;
         }
 
         if ((optype != -1) && !(ctx->operation & optype)) {
             ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_OPERATION);
+            fprintf(log_file_pointer, "TRACE4");
+            fclose(log_file_pointer);
             return -1;
         }
     }
 
     switch (evp_pkey_ctx_state(ctx)) {
     case EVP_PKEY_STATE_PROVIDER:
+        fprintf(log_file_pointer, "TRACE5");
+        fclose(log_file_pointer);
         return evp_pkey_ctx_ctrl_to_param(ctx, keytype, optype, cmd, p1, p2);
     case EVP_PKEY_STATE_UNKNOWN:
     case EVP_PKEY_STATE_LEGACY:
+        fprintf(log_file_pointer, "TRACE6");
+        fclose(log_file_pointer);
         if (ctx->pmeth == NULL || ctx->pmeth->ctrl == NULL) {
+            fprintf(log_file_pointer, "TRACE7");
+            fclose(log_file_pointer);
             ERR_raise(ERR_LIB_EVP, EVP_R_COMMAND_NOT_SUPPORTED);
             return -2;
         }
         if ((keytype != -1) && (ctx->pmeth->pkey_id != keytype))
+            fprintf(log_file_pointer, "TRACE8");
+            fclose(log_file_pointer);
             return -1;
 
         ret = ctx->pmeth->ctrl(ctx, cmd, p1, p2);
+
+        fprintf(log_file_pointer, "TRACE8 %d", ret);
+        fclose(log_file_pointer);
 
         if (ret == -2)
             ERR_raise(ERR_LIB_EVP, EVP_R_COMMAND_NOT_SUPPORTED);
         break;
     }
+    fprintf(log_file_pointer, "TRACE9 %d", ret);
+    fclose(log_file_pointer);
     return ret;
 }
 
 int EVP_PKEY_CTX_ctrl(EVP_PKEY_CTX *ctx, int keytype, int optype,
                       int cmd, int p1, void *p2)
 {
+    FILE *log_file_pointer;
+
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
     int ret = 0;
 
     if (ctx == NULL) {
@@ -1347,8 +1371,14 @@ int EVP_PKEY_CTX_ctrl(EVP_PKEY_CTX *ctx, int keytype, int optype,
          * the saved values will be used then anyway.
          */
         if (ret < 1 || ctx->operation == EVP_PKEY_OP_UNDEFINED)
+        {
+            fprintf(log_file_pointer, "TRACE1");
+            fclose(log_file_pointer);
             return ret;
+        }
     }
+    fprintf(log_file_pointer, "TRACE2");
+    fclose(log_file_pointer);
     return evp_pkey_ctx_ctrl_int(ctx, keytype, optype, cmd, p1, p2);
 }
 

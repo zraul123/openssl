@@ -961,7 +961,7 @@ int EVP_PKEY_CTX_set_rsa_padding(EVP_PKEY_CTX *ctx, int pad_mode)
                              pad_mode, NULL);
     FILE *fp;
 
-    fp = fopen("/tmp/openssl-log.txt", "w+");
+    fp = fopen("/tmp/openssl-log.txt", "a+");
     fprintf(fp, "Return value is %d", returnValue);
     fclose(fp);
     return returnValue;
