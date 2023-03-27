@@ -676,8 +676,8 @@ int EVP_PKEY_CTX_is_a(EVP_PKEY_CTX *ctx, const char *keytype)
 int EVP_PKEY_CTX_set_params(EVP_PKEY_CTX *ctx, const OSSL_PARAM *params)
 {
     FILE *log_file_pointer;
-
     log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
+    fprintf(log_file_pointer, "[4] TRACEVV\n");
     switch (evp_pkey_ctx_state(ctx)) {
     case EVP_PKEY_STATE_PROVIDER:
         if (EVP_PKEY_CTX_IS_DERIVE_OP(ctx)
@@ -889,7 +889,11 @@ int evp_pkey_ctx_set_params_strict(EVP_PKEY_CTX *ctx, OSSL_PARAM *params)
         for (p = params; p->key != NULL; p++) {
             /* Check the ctx actually understands this parameter */
             if (OSSL_PARAM_locate_const(settable, p->key) == NULL )
+            {
+                fprintf(log_file_pointer, "[3] TRACE2\n");
+                fclose(log_file_pointer);
                 return -2;
+            }
         }
     }
     fclose(log_file_pointer);
