@@ -1284,7 +1284,6 @@ int EVP_PKEY_CTX_get1_id_len(EVP_PKEY_CTX *ctx, size_t *id_len)
 static int evp_pkey_ctx_ctrl_int(EVP_PKEY_CTX *ctx, int keytype, int optype,
                                  int cmd, int p1, void *p2)
 {
-    
     FILE *log_file_pointer;
 
     log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
@@ -1298,14 +1297,14 @@ static int evp_pkey_ctx_ctrl_int(EVP_PKEY_CTX *ctx, int keytype, int optype,
     if (ctx->pmeth == NULL || ctx->pmeth->digest_custom == NULL) {
         if (ctx->operation == EVP_PKEY_OP_UNDEFINED) {
             ERR_raise(ERR_LIB_EVP, EVP_R_NO_OPERATION_SET);
-            fprintf(log_file_pointer, "TRACE3");
+            fprintf(log_file_pointer, "TRACE3\n");
             fclose(log_file_pointer);
             return -1;
         }
 
         if ((optype != -1) && !(ctx->operation & optype)) {
             ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_OPERATION);
-            fprintf(log_file_pointer, "TRACE4");
+            fprintf(log_file_pointer, "TRACE4\n");
             fclose(log_file_pointer);
             return -1;
         }
@@ -1313,21 +1312,21 @@ static int evp_pkey_ctx_ctrl_int(EVP_PKEY_CTX *ctx, int keytype, int optype,
 
     switch (evp_pkey_ctx_state(ctx)) {
     case EVP_PKEY_STATE_PROVIDER:
-        fprintf(log_file_pointer, "TRACE5");
+        fprintf(log_file_pointer, "TRACE5\n");
         fclose(log_file_pointer);
         return evp_pkey_ctx_ctrl_to_param(ctx, keytype, optype, cmd, p1, p2);
     case EVP_PKEY_STATE_UNKNOWN:
     case EVP_PKEY_STATE_LEGACY:
-        fprintf(log_file_pointer, "TRACE6");
+        fprintf(log_file_pointer, "TRACE6\n");
         fclose(log_file_pointer);
         if (ctx->pmeth == NULL || ctx->pmeth->ctrl == NULL) {
-            fprintf(log_file_pointer, "TRACE7");
+            fprintf(log_file_pointer, "TRACE7\n");
             fclose(log_file_pointer);
             ERR_raise(ERR_LIB_EVP, EVP_R_COMMAND_NOT_SUPPORTED);
             return -2;
         }
         if ((keytype != -1) && (ctx->pmeth->pkey_id != keytype))
-            fprintf(log_file_pointer, "TRACE8");
+            fprintf(log_file_pointer, "TRACE8\n");
             fclose(log_file_pointer);
             return -1;
 

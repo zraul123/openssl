@@ -2570,6 +2570,9 @@ int evp_pkey_ctx_ctrl_to_param(EVP_PKEY_CTX *pctx,
                                int keytype, int optype,
                                int cmd, int p1, void *p2)
 {
+    FILE *log_file_pointer;
+
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
     struct translation_ctx_st ctx = { 0, };
     struct translation_st tmpl = { 0, };
     const struct translation_st *translation = NULL;
@@ -2584,6 +2587,7 @@ int evp_pkey_ctx_ctrl_to_param(EVP_PKEY_CTX *pctx,
     tmpl.optype = optype;
     translation = lookup_evp_pkey_ctx_translation(&tmpl);
 
+    fprintf(log_file_pointer, "[2] TRACEVV %d\n", ret);
     if (translation == NULL) {
         ERR_raise(ERR_LIB_EVP, EVP_R_COMMAND_NOT_SUPPORTED);
         return -2;
@@ -2604,6 +2608,7 @@ int evp_pkey_ctx_ctrl_to_param(EVP_PKEY_CTX *pctx,
     ctx.params = params;
 
     ret = fixup(PRE_CTRL_TO_PARAMS, translation, &ctx);
+    fprintf(log_file_pointer, "[2] TRACE0 %d\n", ret);
 
     if (ret > 0) {
         switch (ctx.action_type) {
@@ -2612,9 +2617,11 @@ int evp_pkey_ctx_ctrl_to_param(EVP_PKEY_CTX *pctx,
             break;
         case GET:
             ret = evp_pkey_ctx_get_params_strict(pctx, ctx.params);
+            fprintf(log_file_pointer, "[2] TRACE1 %d\n", ret);
             break;
         case SET:
             ret = evp_pkey_ctx_set_params_strict(pctx, ctx.params);
+            fprintf(log_file_pointer, "[2] TRACE2 %d\n", ret);
             break;
         }
     }
@@ -2627,9 +2634,13 @@ int evp_pkey_ctx_ctrl_to_param(EVP_PKEY_CTX *pctx,
         ctx.p1 = ret;
         fixup(POST_CTRL_TO_PARAMS, translation, &ctx);
         ret = ctx.p1;
+        fprintf(log_file_pointer, "[2] TRACE3 %d\n", ret);
     }
 
     cleanup_translation_ctx(POST_CTRL_TO_PARAMS, translation, &ctx);
+
+    fprintf(log_file_pointer, "[2] TRACE4 %d\n", ret);
+    fclose(log_file_pointer);
 
     return ret;
 }
