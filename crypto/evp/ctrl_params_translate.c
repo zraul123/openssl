@@ -2620,7 +2620,9 @@ int evp_pkey_ctx_ctrl_to_param(EVP_PKEY_CTX *pctx,
             fprintf(log_file_pointer, "[2] TRACE1 %d\n", ret);
             break;
         case SET:
+            fclose(log_file_pointer);
             ret = evp_pkey_ctx_set_params_strict(pctx, ctx.params);
+            log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
             fprintf(log_file_pointer, "[2] TRACE2 %d\n", ret);
             break;
         }

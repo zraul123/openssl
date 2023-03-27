@@ -675,35 +675,48 @@ int EVP_PKEY_CTX_is_a(EVP_PKEY_CTX *ctx, const char *keytype)
 
 int EVP_PKEY_CTX_set_params(EVP_PKEY_CTX *ctx, const OSSL_PARAM *params)
 {
+    FILE *log_file_pointer;
+
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
     switch (evp_pkey_ctx_state(ctx)) {
     case EVP_PKEY_STATE_PROVIDER:
         if (EVP_PKEY_CTX_IS_DERIVE_OP(ctx)
             && ctx->op.kex.exchange != NULL
             && ctx->op.kex.exchange->set_ctx_params != NULL)
+            fprintf(log_file_pointer, "[4] TRACE0\n");
+            fclose(log_file_pointer);
             return
                 ctx->op.kex.exchange->set_ctx_params(ctx->op.kex.algctx,
                                                      params);
         if (EVP_PKEY_CTX_IS_SIGNATURE_OP(ctx)
             && ctx->op.sig.signature != NULL
             && ctx->op.sig.signature->set_ctx_params != NULL)
+            fprintf(log_file_pointer, "[4] TRACE1\n");
+            fclose(log_file_pointer);
             return
                 ctx->op.sig.signature->set_ctx_params(ctx->op.sig.algctx,
                                                       params);
         if (EVP_PKEY_CTX_IS_ASYM_CIPHER_OP(ctx)
             && ctx->op.ciph.cipher != NULL
             && ctx->op.ciph.cipher->set_ctx_params != NULL)
+            fprintf(log_file_pointer, "[4] TRACE2\n");
+            fclose(log_file_pointer);
             return
                 ctx->op.ciph.cipher->set_ctx_params(ctx->op.ciph.algctx,
                                                     params);
         if (EVP_PKEY_CTX_IS_GEN_OP(ctx)
             && ctx->keymgmt != NULL
             && ctx->keymgmt->gen_set_params != NULL)
+            fprintf(log_file_pointer, "[4] TRACE3\n");
+            fclose(log_file_pointer);
             return
                 evp_keymgmt_gen_set_params(ctx->keymgmt, ctx->op.keymgmt.genctx,
                                            params);
         if (EVP_PKEY_CTX_IS_KEM_OP(ctx)
             && ctx->op.encap.kem != NULL
             && ctx->op.encap.kem->set_ctx_params != NULL)
+            fprintf(log_file_pointer, "[4] TRACE4\n");
+            fclose(log_file_pointer);
             return
                 ctx->op.encap.kem->set_ctx_params(ctx->op.encap.algctx,
                                                   params);
@@ -711,9 +724,13 @@ int EVP_PKEY_CTX_set_params(EVP_PKEY_CTX *ctx, const OSSL_PARAM *params)
 #ifndef FIPS_MODULE
     case EVP_PKEY_STATE_UNKNOWN:
     case EVP_PKEY_STATE_LEGACY:
+        fprintf(log_file_pointer, "[4] TRACE5\n");
+        fclose(log_file_pointer);
         return evp_pkey_ctx_set_params_to_ctrl(ctx, params);
 #endif
     }
+    fprintf(log_file_pointer, "[4] TRACE6\n");
+    fclose(log_file_pointer);
     return 0;
 }
 
@@ -851,9 +868,14 @@ const OSSL_PARAM *EVP_PKEY_CTX_settable_params(const EVP_PKEY_CTX *ctx)
  */
 int evp_pkey_ctx_set_params_strict(EVP_PKEY_CTX *ctx, OSSL_PARAM *params)
 {
+    FILE *log_file_pointer;
+
+    log_file_pointer = fopen("/tmp/openssl-log.txt", "a+");
+    fprintf(log_file_pointer, "[3] TRACE0\n");
     if (ctx == NULL || params == NULL)
         return 0;
 
+    fprintf(log_file_pointer, "[3] TRACE1\n");
     /*
      * We only check for provider side EVP_PKEY_CTX.  For #legacy, we
      * depend on the translation that happens in EVP_PKEY_CTX_set_params()
@@ -870,6 +892,7 @@ int evp_pkey_ctx_set_params_strict(EVP_PKEY_CTX *ctx, OSSL_PARAM *params)
                 return -2;
         }
     }
+    fclose(log_file_pointer);
 
     return EVP_PKEY_CTX_set_params(ctx, params);
 }
